@@ -9,43 +9,27 @@ interface UserData {
   name: string;
   nameKana: string;
   phone: string;
-  email: string;
+  email: string; // 一意IDとして使用
   age: number;
   sentStatus: '済' | '未';
 }
 
-interface SearchCriteria {
-  name: string;
-  nameKana: string;
-  phone: string;
-  email: string;
-  filterUnsentOnly: boolean;
-}
-
 interface DataTableProps {
   data: UserData[];
-  criteria: SearchCriteria;
 }
 
 const ITEMS_PER_PAGE = 10;
 
-export const DataTable: React.FC<DataTableProps> = ({ data, criteria }) => {
+export const DataTable: React.FC<DataTableProps> = ({ data }) => {
   const [sortKey, setSortKey] = useState<'age' | 'sentStatus'>('age');
   const [sortAsc, setSortAsc] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
 
-  // 絞り込み（未フィルタ対応）
-  const filteredData = data.filter((d) => {
-    if (criteria.filterUnsentOnly && d.sentStatus.trim() !== '未') return false;
-    if (criteria.name && !d.name.includes(criteria.name)) return false;
-    if (criteria.nameKana && !d.nameKana.includes(criteria.nameKana)) return false;
-    if (criteria.phone && !d.phone.includes(criteria.phone)) return false;
-    if (criteria.email && !d.email.includes(criteria.email)) return false;
-    return true;
-  });
+  // ✅ チェックボックス用 state
+  const [selectedItems, setSelectedItems] = useState<string[]>([]);
 
-  // ソート
-  const sortedData = [...filteredData].sort((a, b) => {
+  // ソート処理
+  const sortedData = [...data].sort((a, b) => {
     const v1 = a[sortKey];
     const v2 = b[sortKey];
     if (v1 < v2) return sortAsc ? -1 : 1;
@@ -53,7 +37,6 @@ export const DataTable: React.FC<DataTableProps> = ({ data, criteria }) => {
     return 0;
   });
 
-  // ページング
   const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
   const pagedData = sortedData.slice(startIndex, startIndex + ITEMS_PER_PAGE);
   const totalPages = Math.ceil(sortedData.length / ITEMS_PER_PAGE);
@@ -67,39 +50,70 @@ export const DataTable: React.FC<DataTableProps> = ({ data, criteria }) => {
     }
   };
 
+  // ✅ 全選択チェックボックス
+  const allSelected = pagedData.length > 0 && pagedData.every(d => selectedItems.includes(d.email));
+
+  const handleToggleAll = () => {
+    if (allSelected) {
+      setSelectedItems([]);
+    } else {
+      setSelectedItems(pagedData.map(d => d.email));
+    }
+  };
+
+const handleToggleItem = (key: string) => {
+  if (selectedItems.includes(key)) {
+    setSelectedItems(selectedItems.filter(i => i !== key));
+  } else {
+    setSelectedItems([...selectedItems, key]);
+  }
+};
+
+  if (data.length === 0) {
+    return <p className={styles.noData}>該当するデータがありません。</p>;
+  }
+
   return (
     <>
-      {pagedData.length === 0 ? (
-        <p className={styles.noData}>該当するデータがありません。</p>
-      ) : (
-        <table className={styles.table}>
-          <thead>
-            <tr>
-              <th>氏名<br />
-              <small>氏名カナ</small></th>
-              <th>電話番号</th>
-              <th>メールアドレス</th>
-              <SortableHeader
-                label="年齢"
-                active={sortKey === 'age'}
-                ascending={sortAsc}
-                onClick={() => handleSort('age')}
+      <table className={styles.table}>
+        <thead>
+          <tr>
+            {/* 左端：全選択チェックボックス */}
+            <th>
+              <input
+                type="checkbox"
+                checked={allSelected}
+                onChange={handleToggleAll}
               />
-              <SortableHeader
-                label="送信状況"
-                active={sortKey === 'sentStatus'}
-                ascending={sortAsc}
-                onClick={() => handleSort('sentStatus')}
-              />
-            </tr>
-          </thead>
-          <tbody>
-            {pagedData.map((d, i) => (
-              <TableRow key={i} {...d} />
-            ))}
-          </tbody>
-        </table>
-      )}
+            </th>
+            <th>氏名<br /><small>氏名カナ</small></th>
+            <th>電話番号</th>
+            <th>メールアドレス</th>
+            <SortableHeader
+              label="年齢"
+              active={sortKey === 'age'}
+              ascending={sortAsc}
+              onClick={() => handleSort('age')}
+            />
+            <SortableHeader
+              label="送信状況"
+              active={sortKey === 'sentStatus'}
+              ascending={sortAsc}
+              onClick={() => handleSort('sentStatus')}
+            />
+          </tr>
+        </thead>
+        <tbody>
+          {pagedData.map((d, index) => (
+            <TableRow
+            key={`${d.email}-${index}`} // index を受け取ってユニーク化
+            {...d}
+            selected={selectedItems.includes(d.email)}
+            onToggle={() => handleToggleItem(d.email)}
+          />
+          ))}
+        </tbody>
+      </table>
 
       <PaginationControls
         currentPage={currentPage}

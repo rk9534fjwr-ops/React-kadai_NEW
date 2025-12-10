@@ -19,45 +19,111 @@ interface SearchFormProps {
   onClear: () => void;
 }
 
-export const SearchForm: React.FC<SearchFormProps> = ({ initialCriteria, onSearch, onClear }) => {
+export const SearchForm: React.FC<SearchFormProps> = ({
+  initialCriteria,
+  onSearch,
+  onClear,
+}) => {
   const [form, setForm] = useState<SearchCriteria>(initialCriteria);
+  const [errors, setErrors] = useState<Record<string, string>>({});
 
   useEffect(() => {
     setForm(initialCriteria);
   }, [initialCriteria]);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value, type, checked } = e.target;
-    setForm(prev => ({ ...prev, [name]: type === 'checkbox' ? checked : value }));
+  // ✔ HTMLInputElement | HTMLSelectElement などを含めても OK
+const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+  const target = e.target;
+
+  // checkbox の場合
+  if (target instanceof HTMLInputElement && target.type === 'checkbox') {
+    setForm(prev => ({
+      ...prev,
+      [target.name]: target.checked,
+    }));
+    return;
+  }
+
+  // text / email / tel など通常の input または select
+  setForm(prev => ({
+    ...prev,
+    [target.name]: target.value,
+  }));
+};
+
+  const validate = () => {
+    const newErrors: Record<string, string> = {};
+
+    if (form.name.length > 10)
+      newErrors.name = '氏名は10文字以内で入力してください。';
+
+    if (form.nameKana && !/^[ァ-ヶー ]+$/.test(form.nameKana))
+      newErrors.nameKana = '氏名カナは全角カタカナで入力してください。';
+
+    if (form.phone && !/^[0-9-]+$/.test(form.phone))
+      newErrors.phone = '電話番号は数字とハイフンのみ入力できます。';
+    else if (form.phone.replace(/-/g, '').length > 11)
+      newErrors.phone = '電話番号は11桁以内で入力してください。';
+
+    if (form.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email))
+      newErrors.email = 'メールアドレスの形式が正しくありません。';
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
   };
 
+  const handleSearch = () => {
+    if (validate()) onSearch(form);
+  };
+
+  const handleClear = () => {
+    setForm({
+      name: '',
+      nameKana: '',
+      phone: '',
+      email: '',
+      filterUnsentOnly: false,
+    });
+    setErrors({});
+    onClear();
+  };
+
+  // ✔ name の型を keyof SearchCriteria に固定し any を完全排除
+  const renderInput = (
+    id: string,
+    name: keyof SearchCriteria,
+    label: string,
+    value: string
+  ) => (
+    <div className={styles.inputContainer}>
+      <div className={styles.inputWrapper}>
+        <label htmlFor={id}>{label}</label>
+        <InputField
+          id={id}
+          name={name}
+          value={value}
+          onChange={handleChange}
+          className={styles.input}
+        />
+      </div>
+      {errors[name] && (
+        <span className={styles.errorText}>{errors[name]}</span>
+      )}
+    </div>
+  );
+
   return (
-    <form className={styles.form} onSubmit={e => e.preventDefault()}>
-      {/* 1行目: 氏名・氏名カナ */}
+    <form className={styles.form} onSubmit={(e) => e.preventDefault()}>
       <div className={styles.row}>
-        <div className={styles.inputContainer}>
-          <label htmlFor="name">氏名：</label>
-          <InputField id="name" name="name" value={form.name} onChange={handleChange} className={styles.input} />
-        </div>
-        <div className={styles.inputContainer}>
-          <label htmlFor="nameKana">氏名カナ：</label>
-          <InputField id="nameKana" name="nameKana" value={form.nameKana} onChange={handleChange} className={styles.input} />
-        </div>
+        {renderInput('name', 'name', '氏名：', form.name)}
+        {renderInput('nameKana', 'nameKana', '氏名カナ：', form.nameKana)}
       </div>
 
-      {/* 2行目: 電話番号・メールアドレス */}
       <div className={styles.row}>
-        <div className={styles.inputContainer}>
-          <label htmlFor="phone">電話番号：</label>
-          <InputField id="phone" name="phone" value={form.phone} onChange={handleChange} className={styles.input} />
-        </div>
-        <div className={styles.inputContainer}>
-          <label htmlFor="email">メールアドレス：</label>
-          <InputField id="email" name="email" value={form.email} onChange={handleChange} className={styles.input} />
-        </div>
+        {renderInput('phone', 'phone', '電話番号：', form.phone)}
+        {renderInput('email', 'email', 'メールアドレス：', form.email)}
       </div>
 
-     {/* チェックボックス */}
       <Checkbox
         name="filterUnsentOnly"
         checked={form.filterUnsentOnly}
@@ -66,10 +132,9 @@ export const SearchForm: React.FC<SearchFormProps> = ({ initialCriteria, onSearc
         className={styles.checkboxLabel}
       />
 
-      {/* ボタン */}
       <ButtonGroup
-        onSearch={() => onSearch(form)}
-        onClear={onClear}
+        onSearch={handleSearch}
+        onClear={handleClear}
         searchClass={styles.searchButton}
         clearClass={styles.clearButton}
       />

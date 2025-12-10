@@ -1,5 +1,5 @@
 'use client';
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { SearchForm } from '../organisms/SearchForm';
 import { DataTable } from '../organisms/DataTable';
 import type { SearchCriteria, UserData } from '@/resources/types/UserData';
@@ -13,71 +13,94 @@ const UserSearchTemplate: React.FC = () => {
     filterUnsentOnly: false,
   });
 
-  const [allData, setAllData] = useState<UserData[]>([]);
   const [filteredData, setFilteredData] = useState<UserData[]>([]);
-  const [loading, setLoading] = useState(true); // ← 読み込み中フラグ
+  const [loading, setLoading] = useState(true); // 読み込み中フラグ
+  const [hasSearched, setHasSearched] = useState(false); // ← 検索実行済みフラグを追加
 
-  // ✅ 初回レンダリング時にAPIからデータを取得
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const res = await fetch('/api/users');
-        if (!res.ok) throw new Error('APIエラー');
-        const json = await res.json();
-        setAllData(json.data);
-        setFilteredData(json.data);
-      } catch (error) {
-        console.error('データ取得失敗:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchData();
-  }, []);
+const toQueryParams = (criteria: SearchCriteria): string => {
+  const params = new URLSearchParams();
 
-  // ✅ 検索ボタン押下時
-  const handleSearch = (newCriteria: SearchCriteria) => {
+  Object.entries(criteria).forEach(([key, value]) => {
+    if (typeof value === 'boolean') {
+      params.append(key, value ? 'true' : 'false');
+    }
+
+    if (typeof value === 'string' && value.trim() !== '') {
+      params.append(key, value);
+    }
+  });
+
+  return params.toString();
+};
+
+ // ✅ 検索ボタン押下時（API が絞り込み）
+  const handleSearch = async (newCriteria: SearchCriteria) => {
     setCriteria(newCriteria);
+    setHasSearched(true);
+    setLoading(true);
 
-    const filtered = allData.filter((user) => {
-      if (newCriteria.filterUnsentOnly && user.sentStatus.trim() !== '未') return false;
-      if (newCriteria.name && !user.name.includes(newCriteria.name)) return false;
-      if (newCriteria.nameKana && !user.nameKana.includes(newCriteria.nameKana)) return false;
-      if (newCriteria.phone && !user.phone.includes(newCriteria.phone)) return false;
-      if (newCriteria.email && !user.email.includes(newCriteria.email)) return false;
-      return true;
-    });
+    try {
+      // 検索条件をクエリパラメータに付与
+      const query =toQueryParams(newCriteria).toString();
+      const res = await fetch(`/api/users?${query}`);
 
-    setFilteredData(filtered);
+      if (!res.ok) {
+        console.error('検索 API エラー');
+        return;
+      }
+
+      const json = await res.json();
+      setFilteredData(json.data); // ← API が絞り込んだデータをそのままセット
+    } catch (error) {
+      console.error('検索失敗:', error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   // ✅ クリアボタン押下時
   const handleClear = () => {
-    const cleared = {
+    const cleared: SearchCriteria = {
       name: '',
       nameKana: '',
       phone: '',
       email: '',
       filterUnsentOnly: false,
     };
-    setCriteria(cleared);
-    setFilteredData(allData);
-  };
 
-  // ✅ ローディング中表示
-  if (loading) {
-    return <p style={{ textAlign: 'center', marginTop: '30px' }}>データを読み込み中...</p>;
-  }
+    setCriteria(cleared);
+    setFilteredData([]);
+    setHasSearched(false);
+  };
 
   return (
     <div style={{ padding: '20px' }}>
       <h1 style={{ textAlign: 'center' }}>ユーザー一覧</h1>
+
       <SearchForm
         initialCriteria={criteria}
         onSearch={handleSearch}
         onClear={handleClear}
       />
-      <DataTable data={filteredData} criteria={criteria} />
+
+      {/* ローディング中 */}
+      {loading && (
+        <p style={{ textAlign: 'center', marginTop: '20px' }}>
+          検索中...
+        </p>
+      )}
+
+      {/* 検索前は非表示 */}
+      {!loading && !hasSearched && (
+        <p style={{ textAlign: 'center', marginTop: '20px', color: '#777' }}>
+          検索条件を入力して「検索」を押してください。
+        </p>
+      )}
+
+      {/* 検索後データ表示 */}
+      {!loading && hasSearched && (
+        <DataTable data={filteredData} />
+      )}
     </div>
   );
 };
