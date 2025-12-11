@@ -7,34 +7,32 @@
   background-color: #fafafa;
   border-radius: 6px;
   border: 1px solid #e0e0e0;
-  align-items: center;
   width: 100%;
+  align-items: center; /* ← ここを修正 */
+  margin: 0 auto;          /* ← 追加：フォーム全体を画面中央に */
+  max-width: 900px;        /* ← 追加：横幅が広がりすぎないよう固定 */
 }
 
 /* 入力フィールドの行 */
 .row {
   display: flex;
-  justify-content: center; /* 行全体を中央寄せ */
-  align-items: flex-start;
+  justify-content: flex-start; /* 左寄せ */
   gap: 5rem; /* 各入力欄の間隔 */
   width: 100%;
 }
 
 /* 入力欄 + エラー表示を縦方向にまとめる */
 .inputContainer {
-  display: flex;
-  flex-direction: column;  
-  gap: 0.25rem;
-  min-width: 250px; /* 各列の幅を揃える */
+  display: grid;
+  grid-template-columns: 120px auto; /* 120px = ラベル幅100 + 余白20 */
+  row-gap: 0.3rem;
+  align-items: center; 
+  min-width: 100px; /* 左右列の幅を揃える */
 }
 
 /* ラベル + 入力欄を横並びにするラッパー */
 .inputWrapper {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  gap: 0.5rem;
-  width: 100%;
+  display: contents; /* この中の label と input を親グリッドに流す */
 }
 
 /* ラベル */
@@ -69,16 +67,18 @@
 .errorText {
   color: red;
   font-size: 0.8rem;
-  margin-left: calc(100px + 20px); /* ラベル幅 + ラベル右マージン */
+  grid-column: 1 / span 2; /* ラベルの幅と入力欄の開始位置を正確に使用 */
+  margin-left: 120px;       /* ← ラベル幅に合わせて右へ寄せる */
   line-height: 1.2;
 }
 
 /* ボタングループ */
 .buttonGroup {
   display: flex;
-  justify-content: flex-start; /* 左揃えに変更 */
+  justify-content: center;
   gap: 1rem;
   margin-top: 1rem;
+  width: 100%;            /* ← 追加：中央揃えが正しく効く */
 }
 
 /* 検索ボタン */
