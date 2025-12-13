@@ -15,19 +15,21 @@
 
 /* 入力フィールドの行 */
 .row {
-  display: flex;
-  justify-content: flex-start; /* 左寄せ */
-  gap: 5rem; /* 各入力欄の間隔 */
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  column-gap: 5rem; /* 各入力欄の間隔 */
   width: 100%;
+  align-items: start; /* ← 明示 */
 }
 
 /* 入力欄 + エラー表示を縦方向にまとめる */
 .inputContainer {
   display: grid;
   grid-template-columns: 120px auto; /* 120px = ラベル幅100 + 余白20 */
-  row-gap: 0.3rem;
+  grid-template-rows: auto 1.2rem; /* ← ★追加：エラー用の固定高さ */
+  row-gap: 0.75rem;
   align-items: center; 
-  min-width: 100px; /* 左右列の幅を揃える */
+  width: 120px; /* 左右列の幅を揃える */
 }
 
 /* ラベル + 入力欄を横並びにするラッパー */
@@ -70,6 +72,7 @@
   grid-column: 1 / span 2; /* ラベルの幅と入力欄の開始位置を正確に使用 */
   margin-left: 120px;       /* ← ラベル幅に合わせて右へ寄せる */
   line-height: 1.2;
+  white-space: nowrap;   /* ← ★追加：折り返し禁止 */
 }
 
 /* ボタングループ */

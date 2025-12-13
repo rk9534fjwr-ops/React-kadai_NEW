@@ -54,12 +54,23 @@ export const DataTable: React.FC<DataTableProps> = ({ data }) => {
   const allSelected = pagedData.length > 0 && pagedData.every(d => selectedItems.includes(d.email));
 
   const handleToggleAll = () => {
-    if (allSelected) {
-      setSelectedItems([]);
-    } else {
-      setSelectedItems(pagedData.map(d => d.email));
-    }
-  };
+  if (allSelected) {
+    // 現在ページ分だけ解除
+    setSelectedItems(prev =>
+      prev.filter(
+        key => !pagedData.some(d => d.email === key)
+      )
+    );
+  } else {
+    // 既存 + 現在ページ分を追加（重複防止）
+    setSelectedItems(prev => [
+      ...prev,
+      ...pagedData
+        .map(d => d.email)
+        .filter(key => !prev.includes(key)),
+    ]);
+  }
+};
 
 const handleToggleItem = (key: string) => {
   if (selectedItems.includes(key)) {
@@ -104,9 +115,9 @@ const handleToggleItem = (key: string) => {
           </tr>
         </thead>
         <tbody>
-          {pagedData.map((d, index) => (
+          {pagedData.map(d => (
             <TableRow
-            key={`${d.email}-${index}`} // index を受け取ってユニーク化
+            key={d.email}        // ★ index を使わない
             {...d}
             selected={selectedItems.includes(d.email)}
             onToggle={() => handleToggleItem(d.email)}

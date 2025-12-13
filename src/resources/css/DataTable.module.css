@@ -2,6 +2,7 @@
   border-collapse: collapse;
   width: 100%;
   margin-top: 1rem;
+  table-layout: fixed; /* ← ★追加：列幅を固定 */
 }
 
 .table th,

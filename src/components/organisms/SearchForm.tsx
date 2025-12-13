@@ -72,11 +72,11 @@ const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSearch = () => {
+const handleSearch = () => {
     if (validate()) onSearch(form);
-  };
+};
 
-  const handleClear = () => {
+const handleClear = () => {
     setForm({
       name: '',
       nameKana: '',
@@ -86,7 +86,46 @@ const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
     });
     setErrors({});
     onClear();
-  };
+};
+
+//入力欄のフォーカスアウト
+const validateField = (field: keyof SearchCriteria) => {
+  const newErrors = { ...errors };
+
+  switch (field) {
+    case 'name':
+      if (form.name.length > 10)
+        newErrors.name = '氏名は10文字以内で入力してください。';
+      else delete newErrors.name;
+      break;
+
+    case 'nameKana':
+      if (form.nameKana && !/^[ァ-ヶー ]+$/.test(form.nameKana))
+        newErrors.nameKana = '氏名カナは全角カタカナで入力してください。';
+      else delete newErrors.nameKana;
+      break;
+
+    case 'phone':
+      if (form.phone && !/^[0-9-]+$/.test(form.phone))
+        newErrors.phone = '電話番号は数字とハイフンのみ入力できます。';
+      else if (form.phone.replace(/-/g, '').length > 11)
+        newErrors.phone = '電話番号は11桁以内で入力してください。';
+      else delete newErrors.phone;
+      break;
+
+    case 'email':
+      if (form.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email))
+        newErrors.email = 'メールアドレスの形式が正しくありません。';
+      else delete newErrors.email;
+      break;
+  }
+
+  setErrors(newErrors);
+};
+
+const handleBlur = (field: keyof SearchCriteria) => {
+  validateField(field);
+};
 
   // ✔ name の型を keyof SearchCriteria に固定し any を完全排除
   const renderInput = (
@@ -103,6 +142,7 @@ const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
           name={name}
           value={value}
           onChange={handleChange}
+          onBlur={() => handleBlur(name)}  // ← 追加
           className={styles.input}
         />
       </div>
