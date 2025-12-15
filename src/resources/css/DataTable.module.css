@@ -78,3 +78,26 @@
   width: 40px; /* チェックボックス列 */
   text-align: center;
 }
+
+/* 確認ボタンのラッパー（中央寄せ） */
+.confirmWrapper {
+  margin-top: 1.5rem;
+  display: flex;
+  justify-content: center;
+}
+
+/* 確認ボタン本体 */
+.confirmButton {
+  padding: 0.6rem 1.8rem;
+  border: 2px solid #0070f3;
+  border-radius: 6px;
+  background-color: white;
+  color: #0070f3;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.confirmButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}

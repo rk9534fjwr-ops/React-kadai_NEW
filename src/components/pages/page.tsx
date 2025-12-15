@@ -2,9 +2,16 @@
 import React, { useState } from 'react';
 import { SearchForm } from '../organisms/SearchForm';
 import { DataTable } from '../organisms/DataTable';
+import { ConfirmSend } from '../organisms/ConfirmSend';
 import type { SearchCriteria, UserData } from '@/resources/types/UserData';
+import { SendComplete } from '../organisms/SendComplete';
 
 const UserSearchTemplate: React.FC = () => {
+  //送信完了画面
+const [mode, setMode] =
+  useState<'search' | 'confirm' | 'complete'>('search');
+
+  // 🔹 検索条件
   const [criteria, setCriteria] = useState<SearchCriteria>({
     name: '',
     nameKana: '',
@@ -14,92 +21,116 @@ const UserSearchTemplate: React.FC = () => {
   });
 
   const [filteredData, setFilteredData] = useState<UserData[]>([]);
-  const [loading, setLoading] = useState(true); // 読み込み中フラグ
-  const [hasSearched, setHasSearched] = useState(false); // ← 検索実行済みフラグを追加
+  const [loading, setLoading] = useState(false);
+  const [hasSearched, setHasSearched] = useState(false);
+  const [selectedEmails, setSelectedEmails] = useState<string[]>([]);
 
-const toQueryParams = (criteria: SearchCriteria): string => {
-  const params = new URLSearchParams();
-
-  Object.entries(criteria).forEach(([key, value]) => {
-    if (typeof value === 'boolean') {
-      params.append(key, value ? 'true' : 'false');
-    }
-
-    if (typeof value === 'string' && value.trim() !== '') {
-      params.append(key, value);
-    }
-  });
-
-  return params.toString();
-};
-
- // ✅ 検索ボタン押下時（API が絞り込み）
-  const handleSearch = async (newCriteria: SearchCriteria) => {
-    setCriteria(newCriteria);
-    setHasSearched(true);
-    setLoading(true);
-
-    try {
-      // 検索条件をクエリパラメータに付与
-      const query =toQueryParams(newCriteria).toString();
-      const res = await fetch(`/api/users?${query}`);
-
-      if (!res.ok) {
-        console.error('検索 API エラー');
-        return;
-      }
-
-      const json = await res.json();
-      setFilteredData(json.data); // ← API が絞り込んだデータをそのままセット
-    } catch (error) {
-      console.error('検索失敗:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // ✅ クリアボタン押下時
-  const handleClear = () => {
-    const cleared: SearchCriteria = {
+  // ✅ 検索解除状態に戻す共通関数
+  const resetToInitial = () => {
+    setCriteria({
       name: '',
       nameKana: '',
       phone: '',
       email: '',
       filterUnsentOnly: false,
-    };
-
-    setCriteria(cleared);
+    });
     setFilteredData([]);
     setHasSearched(false);
+    setSelectedEmails([]);
+    setMode('search');
   };
 
-  return (
+   // 🔹 検索
+  const handleSearch = async (newCriteria: SearchCriteria) => {
+    setCriteria(newCriteria);
+    setHasSearched(true);
+    setLoading(true);
+
+  const toQueryParams = (criteria: SearchCriteria): string => {
+  const params = new URLSearchParams();
+  Object.entries(criteria).forEach(([key, value]) => {
+    if (typeof value === 'boolean') {
+      params.append(key, value ? 'true' : 'false');
+    }
+    if (typeof value === 'string' && value.trim() !== '') {
+      params.append(key, value);
+    }
+  });
+  return params.toString();
+};
+
+    try {
+      const query = toQueryParams(newCriteria);
+      const res = await fetch(`/api/users?${query}`);
+      const json = await res.json();
+      setFilteredData(json.data);
+    } finally {
+    setLoading(false);
+  }
+  };
+
+const selectedUsers = filteredData.filter(u =>
+    selectedEmails.includes(u.email)
+  );
+
+ // 🔹 送信
+const handleSend = async () => {
+  try {
+    await fetch('/api/send', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ emails: selectedEmails }),
+    });
+
+    // ✅ 完了画面へ
+    setMode('complete');
+  } catch (error) {
+    console.error('送信失敗:', error);
+  }
+};
+
+    return (
     <div style={{ padding: '20px' }}>
       <h1 style={{ textAlign: 'center' }}>ユーザー一覧</h1>
 
-      <SearchForm
-        initialCriteria={criteria}
-        onSearch={handleSearch}
-        onClear={handleClear}
-      />
+      {mode === 'search' && (
+        <>
+        <SearchForm
+            initialCriteria={criteria}
+            onSearch={handleSearch}
+            onClear={resetToInitial}
+        />
 
-      {/* ローディング中 */}
-      {loading && (
-        <p style={{ textAlign: 'center', marginTop: '20px' }}>
-          検索中...
-        </p>
+        {loading && (
+  <p style={{ textAlign: 'center', marginTop: '20px' }}>
+    検索中...
+  </p>
+)}
+
+        {hasSearched && (
+            <DataTable
+              data={filteredData}
+              selectedEmails={selectedEmails}
+              onChangeSelected={setSelectedEmails}
+              onConfirm={() => setMode('confirm')}
+            />
+        )}
+      </>
+    )}
+
+      {mode === 'confirm' && (
+        <ConfirmSend
+          users={selectedUsers}
+          onBack={() => setMode('search')}
+          onSend={handleSend}
+        />
       )}
 
-      {/* 検索前は非表示 */}
-      {!loading && !hasSearched && (
-        <p style={{ textAlign: 'center', marginTop: '20px', color: '#777' }}>
-          検索条件を入力して「検索」を押してください。
-        </p>
-      )}
-
-      {/* 検索後データ表示 */}
-      {!loading && hasSearched && (
-        <DataTable data={filteredData} />
+      {mode === 'complete' && (
+        <SendComplete
+          count={selectedEmails.length}
+          onBack={resetToInitial}
+        />
       )}
     </div>
   );

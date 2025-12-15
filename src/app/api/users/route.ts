@@ -44,8 +44,9 @@ export async function GET(request: Request) {
     // -----------------------------
     // 🔍 バックエンドで絞り込み処理
     // -----------------------------
-    const filtered = data.data.filter((user: UserData) => {
-      if (criteria.filterUnsentOnly && user.sentStatus.trim() !== '未') return false;
+    const users: UserData[] = data.data ?? data;
+    const filtered = users.filter((user) => {
+      if (criteria.filterUnsentOnly && user.sentStatus !== '未') return false;
       if (criteria.name && !user.name.includes(criteria.name)) return false;
       if (criteria.nameKana && !user.nameKana.includes(criteria.nameKana)) return false;
       if (criteria.phone && !user.phone.includes(criteria.phone)) return false;

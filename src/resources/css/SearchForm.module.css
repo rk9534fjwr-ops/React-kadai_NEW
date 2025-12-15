@@ -25,7 +25,7 @@
 /* 入力欄 + エラー表示を縦方向にまとめる */
 .inputContainer {
   display: grid;
-  grid-template-columns: 120px auto; /* 120px = ラベル幅100 + 余白20 */
+  grid-template-columns: 130px auto; /* 120px = ラベル幅100 + 余白20 */
   grid-template-rows: auto 1.2rem; /* ← ★追加：エラー用の固定高さ */
   row-gap: 0.75rem;
   align-items: center; 
@@ -70,7 +70,7 @@
   color: red;
   font-size: 0.8rem;
   grid-column: 1 / span 2; /* ラベルの幅と入力欄の開始位置を正確に使用 */
-  margin-left: 120px;       /* ← ラベル幅に合わせて右へ寄せる */
+  margin-left: 130px;       /* ← ラベル幅に合わせて右へ寄せる */
   line-height: 1.2;
   white-space: nowrap;   /* ← ★追加：折り返し禁止 */
 }

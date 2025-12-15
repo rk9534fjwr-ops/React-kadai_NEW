@@ -1,0 +1,36 @@
+/* 確認ボタンのラッパー（中央寄せ） */
+.confirmWrapper {
+  margin-top: 1.5rem;
+  display: flex;
+  justify-content: center;
+}
+
+/* 確認ボタン本体 */
+.confirmButton {
+  padding: 0.6rem 1.8rem;
+  border: 2px solid #0070f3;
+  border-radius: 6px;
+  background-color: white;
+  color: #0070f3;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.table {
+  border-collapse: collapse;
+  width: 100%;
+  margin-top: 1rem;
+  table-layout: fixed;
+}
+
+.table th,
+.table td {
+  border: 1px solid #999;
+  padding: 0.4rem 0.8rem;
+  text-align: left;
+}
+
+.table th {
+  background-color: #dbeadf;
+  user-select: none;
+}
