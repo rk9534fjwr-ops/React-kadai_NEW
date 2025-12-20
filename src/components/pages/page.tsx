@@ -4,12 +4,10 @@ import { SearchForm } from '../organisms/SearchForm';
 import { DataTable } from '../organisms/DataTable';
 import { ConfirmSend } from '../organisms/ConfirmSend';
 import type { SearchCriteria, UserData } from '@/resources/types/UserData';
-import { SendComplete } from '../organisms/SendComplete';
 
 const UserSearchTemplate: React.FC = () => {
-  //送信完了画面
 const [mode, setMode] =
-  useState<'search' | 'confirm' | 'complete'>('search');
+  useState<'search' | 'confirm'>('search');
 
   // 🔹 検索条件
   const [criteria, setCriteria] = useState<SearchCriteria>({
@@ -59,15 +57,15 @@ const [mode, setMode] =
   return params.toString();
 };
 
-    try {
-      const query = toQueryParams(newCriteria);
-      const res = await fetch(`/api/users?${query}`);
-      const json = await res.json();
-      setFilteredData(json.data);
-    } finally {
+  try {
+    const query = toQueryParams(newCriteria);
+    const res = await fetch(`/api/users?${query}`);
+    const json = await res.json();
+    setFilteredData(json.data);
+  } finally {
     setLoading(false);
   }
-  };
+};
 
 const selectedUsers = filteredData.filter(u =>
     selectedEmails.includes(u.email)
@@ -82,12 +80,13 @@ const handleSend = async () => {
       body: JSON.stringify({ emails: selectedEmails }),
     });
 
-    // ✅ 完了画面へ
-    setMode('complete');
-  } catch (error) {
-    console.error('送信失敗:', error);
-  }
-};
+      // ✅ 送信後は検索解除状態に戻る
+      resetToInitial();
+
+    } catch (error) {
+      console.error('送信失敗:', error);
+    }
+  };
 
     return (
     <div style={{ padding: '20px' }}>
@@ -123,13 +122,6 @@ const handleSend = async () => {
           users={selectedUsers}
           onBack={() => setMode('search')}
           onSend={handleSend}
-        />
-      )}
-
-      {mode === 'complete' && (
-        <SendComplete
-          count={selectedEmails.length}
-          onBack={resetToInitial}
         />
       )}
     </div>

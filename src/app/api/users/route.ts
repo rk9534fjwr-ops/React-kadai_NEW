@@ -12,6 +12,7 @@ interface UserData {
 }
 
 // SearchCriteria 型（必要に応じて調整）
+/*
 interface SearchCriteria {
   name?: string;
   nameKana?: string;
@@ -19,11 +20,14 @@ interface SearchCriteria {
   email?: string;
   filterUnsentOnly?: boolean;
 }
+*/
 
-export async function GET(request: Request) {
+export async function GET() {
   try {
     // クエリパラメータ取得
+    /*
     const { searchParams } = new URL(request.url);
+    */
 
     // JSON ファイルパス生成
     const filePath = path.join(process.cwd(), 'src', 'resources', 'stub', 'users.json');
@@ -32,7 +36,9 @@ export async function GET(request: Request) {
     const jsonData = await fs.readFile(filePath, 'utf8');
     const data = JSON.parse(jsonData);
 
-    // クエリを SearchCriteria に変換
+    const users: UserData[] = data.data ?? data;
+
+    /*  クエリを SearchCriteria に変換
     const criteria: SearchCriteria = {
       name: searchParams.get('name') || undefined,
       nameKana: searchParams.get('nameKana') || undefined,
@@ -40,11 +46,9 @@ export async function GET(request: Request) {
       email: searchParams.get('email') || undefined,
       filterUnsentOnly: searchParams.get('filterUnsentOnly') === 'true',
     };
+    */
 
-    // -----------------------------
-    // 🔍 バックエンドで絞り込み処理
-    // -----------------------------
-    const users: UserData[] = data.data ?? data;
+    /*  バックエンドで絞り込み処理
     const filtered = users.filter((user) => {
       if (criteria.filterUnsentOnly && user.sentStatus !== '未') return false;
       if (criteria.name && !user.name.includes(criteria.name)) return false;
@@ -53,12 +57,13 @@ export async function GET(request: Request) {
       if (criteria.email && !user.email.includes(criteria.email)) return false;
 
       return true;
-    });
+    }); 
+    */
 
     // 結果返却
-    return NextResponse.json({
+return NextResponse.json({
       status: 'success',
-      data: filtered,
+      data: users,
     });
   } catch (error) {
     console.error('JSON読み込みエラー:', error);
