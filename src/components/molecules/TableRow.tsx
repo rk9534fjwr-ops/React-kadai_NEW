@@ -8,7 +8,7 @@ interface TableRowProps {
   email: string;
   age: number;
   sentStatus: '済' | '未';
-  // ✅ チェックボックス用
+  // チェックボックス用
   selected: boolean;
   onToggle: () => void;
 }

@@ -60,11 +60,11 @@ export async function GET() {
     }); 
     */
 
-    // 結果返却
+// 結果返却
 return NextResponse.json({
-      status: 'success',
-      data: users,
-    });
+  status: 'success',
+  data: users,
+});
   } catch (error) {
     console.error('JSON読み込みエラー:', error);
     return NextResponse.json(

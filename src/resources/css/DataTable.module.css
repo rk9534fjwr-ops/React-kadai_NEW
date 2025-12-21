@@ -17,11 +17,48 @@
   user-select: none;
 }
 
+/* 氏名 */
+.table th:nth-child(2),
+.table td:nth-child(2) {
+  width: 160px;
+}
+
+/* 電話番号 */
+.table th:nth-child(3),
+.table td:nth-child(3) {
+  width: 150px;
+}
+
+/* メール */
+.table th:nth-child(4),
+.table td:nth-child(4) {
+  width: 240px;
+}
+
+/* 年齢 */
+.table th:nth-child(5),
+.table td:nth-child(5) {
+  width: 80px;
+  text-align: center;
+}
+
+/* 送信状況 */
+.table th:nth-child(6),
+.table td:nth-child(6) {
+  width: 110px;
+  text-align: center;
+}
+
+/* テーブルを包んでいる親要素に追加 */
+.tableWrapper {
+  scrollbar-gutter: stable;
+} 
+
 .sortable:hover {
   background-color: #c0d9c7;
 }
 
-/* 🔹 テーブル非表示時のスタイル */
+/* テーブル非表示時のスタイル */
 .table.hidden {
   display: none;
 }
@@ -52,7 +89,7 @@
   opacity: 0.5;
 }
 
-/* 🔹 検索前メッセージ */
+/* 検索前メッセージ */
 .no-data-message {
   text-align: center;
   margin-top: 20px;
@@ -61,7 +98,7 @@
   animation: fadeIn 0.4s ease;
 }
 
-/* 🔹 フェードイン効果 */
+/* フェードイン効果 */
 @keyframes fadeIn {
   from {
     opacity: 0;

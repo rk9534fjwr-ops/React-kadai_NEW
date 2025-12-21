@@ -31,52 +31,61 @@ export const SearchForm: React.FC<SearchFormProps> = ({
     setForm(initialCriteria);
   }, [initialCriteria]);
 
-  // ✔ HTMLInputElement | HTMLSelectElement などを含めても OK
-const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-  const target = e.target;
+  // 入力変更
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) => {
+    const target = e.target;
 
-  // checkbox の場合
-  if (target instanceof HTMLInputElement && target.type === 'checkbox') {
+    // checkbox の場合
+    if (target instanceof HTMLInputElement && target.type === 'checkbox') {
+      setForm(prev => ({
+        ...prev,
+        [target.name]: target.checked,
+      }));
+      return;
+    }
+
+    // text / email / tel / select
     setForm(prev => ({
       ...prev,
-      [target.name]: target.checked,
+      [target.name]: target.value,
     }));
-    return;
-  }
+  };
 
-  // text / email / tel など通常の input または select
-  setForm(prev => ({
-    ...prev,
-    [target.name]: target.value,
-  }));
-};
-
+  // 全体バリデーション（検索時）
   const validate = () => {
     const newErrors: Record<string, string> = {};
 
-    if (form.name.length > 10)
+    if (form.name.length > 10){
       newErrors.name = '氏名は10文字以内で入力してください。';
+    }
 
-    if (form.nameKana && !/^[ァ-ヶー ]+$/.test(form.nameKana))
+    if (form.nameKana && !/^[ァ-ヶー ]+$/.test(form.nameKana)){
       newErrors.nameKana = '氏名カナは全角カタカナで入力してください。';
+    }
 
-    if (form.phone && !/^[0-9-]+$/.test(form.phone))
+    if (form.phone && !/^[0-9-]+$/.test(form.phone)){
       newErrors.phone = '電話番号は数字とハイフンのみ入力できます。';
-    else if (form.phone.replace(/-/g, '').length > 11)
+    } else if (form.phone.replace(/-/g, '').length > 11){
       newErrors.phone = '電話番号は11桁以内で入力してください。';
+    }
 
-    if (form.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email))
+    if (form.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)){
       newErrors.email = 'メールアドレスの形式が正しくありません。';
+    }
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
-const handleSearch = () => {
-    if (validate()) onSearch(form);
-};
+  const handleSearch = () => {
+    if (validate()) {
+      onSearch(form);
+    }
+  };
 
-const handleClear = () => {
+  const handleClear = () => {
     setForm({
       name: '',
       nameKana: '',
@@ -86,46 +95,60 @@ const handleClear = () => {
     });
     setErrors({});
     onClear();
-};
+  };
 
-//入力欄のフォーカスアウト
-const validateField = (field: keyof SearchCriteria) => {
-  const newErrors = { ...errors };
+  //入力欄のフォーカスアウト
+  const validateField = (field: keyof SearchCriteria) => {
+    const newErrors = { ...errors };
 
-  switch (field) {
-    case 'name':
-      if (form.name.length > 10)
+    switch (field) {
+      case 'name':
+        if (form.name.length > 10){
         newErrors.name = '氏名は10文字以内で入力してください。';
-      else delete newErrors.name;
+        } else {
+          delete newErrors.name;
+        } 
+        break;
+
+      case 'nameKana':
+        if (form.nameKana && !/^[ァ-ヶー ]+$/.test(form.nameKana)){
+          newErrors.nameKana = 
+            '氏名カナは全角カタカナで入力してください。';
+        } else {
+          delete newErrors.nameKana;
+        }
+        break;
+
+      case 'phone':
+        if (form.phone && !/^[0-9-]+$/.test(form.phone)){
+          newErrors.phone = 
+            '電話番号は数字とハイフンのみ入力できます。';
+        } else if (form.phone.replace(/-/g, '').length > 11){
+          newErrors.phone = '電話番号は11桁以内で入力してください。';
+        } else {
+          delete newErrors.phone;
+        }
+        break;
+
+      case 'email':
+      if (
+        form.email && 
+        !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)
+      ) {
+        newErrors.email = 
+          'メールアドレスの形式が正しくありません。';
+      } else {
+        delete newErrors.email;
+      }
       break;
+    }
 
-    case 'nameKana':
-      if (form.nameKana && !/^[ァ-ヶー ]+$/.test(form.nameKana))
-        newErrors.nameKana = '氏名カナは全角カタカナで入力してください。';
-      else delete newErrors.nameKana;
-      break;
+    setErrors(newErrors);
+  };
 
-    case 'phone':
-      if (form.phone && !/^[0-9-]+$/.test(form.phone))
-        newErrors.phone = '電話番号は数字とハイフンのみ入力できます。';
-      else if (form.phone.replace(/-/g, '').length > 11)
-        newErrors.phone = '電話番号は11桁以内で入力してください。';
-      else delete newErrors.phone;
-      break;
-
-    case 'email':
-      if (form.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email))
-        newErrors.email = 'メールアドレスの形式が正しくありません。';
-      else delete newErrors.email;
-      break;
-  }
-
-  setErrors(newErrors);
-};
-
-const handleBlur = (field: keyof SearchCriteria) => {
-  validateField(field);
-};
+  const handleBlur = (field: keyof SearchCriteria) => {
+    validateField(field);
+  };
 
   // ✔ name の型を keyof SearchCriteria に固定し any を完全排除
   const renderInput = (
@@ -153,15 +176,28 @@ const handleBlur = (field: keyof SearchCriteria) => {
   );
 
   return (
-    <form className={styles.form} onSubmit={(e) => e.preventDefault()}>
+    <form 
+      className={styles.form} 
+      onSubmit={(e) => e.preventDefault()}
+    >
       <div className={styles.row}>
         {renderInput('name', 'name', '氏名：', form.name)}
-        {renderInput('nameKana', 'nameKana', '氏名カナ：', form.nameKana)}
+        {renderInput(
+          'nameKana', 
+          'nameKana', 
+          '氏名カナ：', 
+          form.nameKana
+        )}
       </div>
 
       <div className={styles.row}>
         {renderInput('phone', 'phone', '電話番号：', form.phone)}
-        {renderInput('email', 'email', 'メールアドレス：', form.email)}
+        {renderInput(
+          'email', 
+          'email', 
+          'メールアドレス：', 
+          form.email
+        )}
       </div>
 
       <Checkbox

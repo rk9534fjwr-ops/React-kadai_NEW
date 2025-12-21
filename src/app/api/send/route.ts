@@ -17,6 +17,7 @@ export async function POST(request: Request) {
     });
   } catch (error) {
     console.error('送信 stub エラー:', error);
+    
     return NextResponse.json(
       { status: 'error', message: '送信に失敗しました' },
       { status: 500 }

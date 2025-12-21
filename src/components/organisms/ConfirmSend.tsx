@@ -40,15 +40,18 @@ export const ConfirmSend: React.FC<ConfirmSendProps> = ({
       </table>
 
       <div className={styles.confirmWrapper}>
-        <button onClick={onBack}
-                className={styles.confirmButton}
+        <button 
+          onClick={onBack}
+          className={styles.confirmButton}
         >
-            戻る</button>
+          戻る
+        </button>
+
         <button
           onClick={onSend}
           className={styles.confirmButton}
         >
-            送信
+          送信
         </button>
       </div>
     </div>
