@@ -4,14 +4,7 @@ import { InputField } from '../molecules/InputField';
 import { ButtonGroup } from '../molecules/ButtonGroup';
 import { Checkbox } from '../atoms/Checkbox';
 import styles from '../../resources/css/SearchForm.module.css';
-
-interface SearchCriteria {
-  name: string;
-  nameKana: string;
-  phone: string;
-  email: string;
-  filterUnsentOnly: boolean;
-}
+import type { SearchCriteria } from '@/resources/types/UserData';
 
 interface SearchFormProps {
   initialCriteria: SearchCriteria;
@@ -91,7 +84,6 @@ export const SearchForm: React.FC<SearchFormProps> = ({
       nameKana: '',
       phone: '',
       email: '',
-      filterUnsentOnly: false,
     });
     setErrors({});
     onClear();
@@ -199,14 +191,6 @@ export const SearchForm: React.FC<SearchFormProps> = ({
           form.email
         )}
       </div>
-
-      <Checkbox
-        name="filterUnsentOnly"
-        checked={form.filterUnsentOnly}
-        onChange={handleChange}
-        label="未でフィルタする"
-        className={styles.checkboxLabel}
-      />
 
       <ButtonGroup
         onSearch={handleSearch}

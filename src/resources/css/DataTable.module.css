@@ -1,13 +1,17 @@
+html {
+  overflow-y: scroll;
+}
+
 .table {
   border-collapse: collapse;
   width: 100%;
   margin-top: 1rem;
-  table-layout: fixed; /* ← ★追加：列幅を固定 */
+  table-layout: fixed;
 }
 
 .table th,
 .table td {
-  border: 1px solid #999;
+  border: 0.0625rem solid #999; /* 1px */
   padding: 0.4rem 0.8rem;
   text-align: left;
 }
@@ -20,53 +24,53 @@
 /* 氏名 */
 .table th:nth-child(2),
 .table td:nth-child(2) {
-  width: 160px;
+  width: 10rem; /* 160px */
 }
 
 /* 電話番号 */
 .table th:nth-child(3),
 .table td:nth-child(3) {
-  width: 150px;
+  width: 9.375rem; /* 150px */
 }
 
 /* メール */
 .table th:nth-child(4),
 .table td:nth-child(4) {
-  width: 240px;
+  width: 15rem; /* 240px */
 }
 
 /* 年齢 */
 .table th:nth-child(5),
 .table td:nth-child(5) {
-  width: 80px;
+  width: 5rem; /* 80px */
   text-align: center;
 }
 
 /* 送信状況 */
 .table th:nth-child(6),
 .table td:nth-child(6) {
-  width: 110px;
+  width: 6.875rem; /* 110px */
   text-align: center;
 }
 
-/* テーブルを包んでいる親要素に追加 */
-.tableWrapper {
-  scrollbar-gutter: stable;
-} 
+/* チェックボックス列 */
+.table th:first-child,
+.table td:first-child {
+  width: 2.5rem; /* 40px */
+  text-align: center;
+}
 
 .sortable:hover {
   background-color: #c0d9c7;
 }
 
-/* テーブル非表示時のスタイル */
 .table.hidden {
   display: none;
 }
 
-/* ここからページネーション用のスタイル */
+/* ページネーション */
 .pagination {
   margin-top: 1rem;
-  /* 横並びにして中央寄せ */
   display: flex;
   gap: 0.5rem;
   justify-content: center;
@@ -74,7 +78,7 @@
 
 .pagination button {
   padding: 0.3rem 0.8rem;
-  border: 1px solid #999;
+  border: 0.0625rem solid #999;
   background-color: #f9f9f9;
   cursor: pointer;
   transition: background-color 0.2s ease;
@@ -92,17 +96,17 @@
 /* 検索前メッセージ */
 .no-data-message {
   text-align: center;
-  margin-top: 20px;
+  margin-top: 1.25rem; /* 20px */
   color: #777;
   font-size: 0.95rem;
   animation: fadeIn 0.4s ease;
 }
 
-/* フェードイン効果 */
+/* フェードイン */
 @keyframes fadeIn {
   from {
     opacity: 0;
-    transform: translateY(-5px);
+    transform: translateY(-0.3125rem); /* 5px */
   }
   to {
     opacity: 1;
@@ -110,24 +114,17 @@
   }
 }
 
-.table th:first-child,
-.table td:first-child {
-  width: 40px; /* チェックボックス列 */
-  text-align: center;
-}
-
-/* 確認ボタンのラッパー（中央寄せ） */
+/* 確認ボタン */
 .confirmWrapper {
   margin-top: 1.5rem;
   display: flex;
   justify-content: center;
 }
 
-/* 確認ボタン本体 */
 .confirmButton {
   padding: 0.6rem 1.8rem;
-  border: 2px solid #0070f3;
-  border-radius: 6px;
+  border: 0.125rem solid #0070f3; /* 2px */
+  border-radius: 0.375rem; /* 6px */
   background-color: white;
   color: #0070f3;
   font-weight: 600;

@@ -14,10 +14,9 @@ const UserSearchTemplate: React.FC = () => {
     nameKana: '',
     phone: '',
     email: '',
-    filterUnsentOnly: false,
   });
 
-  const [searchResults, setFilteredData] = useState<UserData[]>([]);
+  const [searchResults, setSearchResults] = useState<UserData[]>([]);
   const [loading, setLoading] = useState(false);
   const [hasSearched, setHasSearched] = useState(false);
   const [selectedEmails, setSelectedEmails] = useState<string[]>([]);
@@ -29,9 +28,8 @@ const UserSearchTemplate: React.FC = () => {
       nameKana: '',
       phone: '',
       email: '',
-      filterUnsentOnly: false,
     });
-    setFilteredData([]);
+    setSearchResults([]);
     setHasSearched(false);
     setSelectedEmails([]);
     setMode('search');
@@ -62,15 +60,11 @@ const UserSearchTemplate: React.FC = () => {
       const query = toQueryParams(newCriteria);
       const res = await fetch(`/api/users?${query}`);
       const json = await res.json();
-      setFilteredData(json.data);
+      setSearchResults(json.data);
     } finally {
       setLoading(false);
     }
-  };
-
-  const selectedUsers = searchResults.filter(u =>
-    selectedEmails.includes(u.email)
-  );
+  };  
 
   //  送信
   const handleSend = async () => {
@@ -118,10 +112,10 @@ const UserSearchTemplate: React.FC = () => {
           )}
         </>
       )}
-
       {mode === 'confirm' && (
         <ConfirmSend
-          users={selectedUsers}
+          users={searchResults}          // 検索結果そのまま渡す
+          selectedEmails={selectedEmails} // 選択状態も渡す
           onBack={() => setMode('search')}
           onSend={handleSend}
         />

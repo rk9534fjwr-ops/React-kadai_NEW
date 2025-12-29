@@ -4,4 +4,6 @@ interface TableCellProps {
   children: React.ReactNode;
 }
 
-export const TableCell: React.FC<TableCellProps> = ({ children }) => <td>{children}</td>;
+export const TableCell: React.FC<TableCellProps> = ({ children }) => {
+  return <td>{children}</td>;
+};

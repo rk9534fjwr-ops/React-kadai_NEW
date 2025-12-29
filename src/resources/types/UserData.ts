@@ -13,7 +13,6 @@ export interface SearchCriteria {
   nameKana: string;
   phone: string;
   email: string;
-  filterUnsentOnly: boolean;
 }
 
 export interface ApiResponse {
