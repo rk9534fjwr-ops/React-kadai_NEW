@@ -114,12 +114,13 @@ const UserSearchTemplate: React.FC = () => {
       )}
       {mode === 'confirm' && (
         <ConfirmSend
-          users={searchResults}          // 検索結果そのまま渡す
-          selectedEmails={selectedEmails} // 選択状態も渡す
-          onBack={() => setMode('search')}
-          onSend={handleSend}
-        />
+          users={searchResults.filter(user =>
+          selectedEmails.includes(user.email)
       )}
+    onBack={() => setMode('search')}
+    onSend={handleSend}
+  />
+)}
     </div>
   );
 };

@@ -142,7 +142,7 @@ export const SearchForm: React.FC<SearchFormProps> = ({
     validateField(field);
   };
 
-  // ✔ name の型を keyof SearchCriteria に固定し any を完全排除
+  // name の型を keyof SearchCriteria に固定し any を完全排除
   const renderInput = (
     id: string,
     name: keyof SearchCriteria,
@@ -157,7 +157,7 @@ export const SearchForm: React.FC<SearchFormProps> = ({
           name={name}
           value={value}
           onChange={handleChange}
-          onBlur={() => handleBlur(name)}  // ← 追加
+          onBlur={() => handleBlur(name)}  // 追加
           className={styles.input}
         />
       </div>

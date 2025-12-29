@@ -79,7 +79,7 @@
 .buttonGroup {
   display: flex;
   justify-content: center;
-  gap: 1rem;
+  gap: 2.5rem;
   margin-top: 1rem;
   width: 100%;            /* ← 追加：中央揃えが正しく効く */
 }
@@ -132,4 +132,20 @@
   width: 18px;
   height: 18px;
   cursor: pointer;
+}
+
+/* ===== レスポンシブ対応 ===== */
+@media (max-width: 768px) {
+  .row {
+    grid-template-columns: 1fr;
+    gap: 0.5rem;
+  }
+
+  .name {
+    font-weight: bold;
+  }
+
+  .phone {
+    font-size: 0.9rem;
+  }
 }

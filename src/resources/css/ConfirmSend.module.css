@@ -3,10 +3,23 @@
   margin-top: 1.5rem;
   display: flex;
   justify-content: center;
+  gap: 2.5rem;
 }
 
-/* 確認ボタン本体 */
-.confirmButton {
+/* 戻るボタン*/
+.backButton {
+  padding: 0.6rem 1.2rem;
+  border: 2px solid #999;
+  border-radius: 4px;
+  background-color: white;
+  color: #333;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+/* 送信ボタン*/
+.sendButton {
   padding: 0.6rem 1.8rem;
   border: 2px solid #0070f3;
   border-radius: 6px;

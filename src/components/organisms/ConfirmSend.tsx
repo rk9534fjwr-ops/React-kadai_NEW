@@ -5,29 +5,19 @@ import styles from '../../resources/css/ConfirmSend.module.css';
 
 interface ConfirmSendProps {
   users: UserData[];          // 検索結果全体
-  selectedEmails: string[];   // 選択されたメール一覧
   onBack: () => void;
   onSend: () => void;
 }
 
 export const ConfirmSend: React.FC<ConfirmSendProps> = ({
   users,
-  selectedEmails,
   onBack,
   onSend,
 }) => {
-  // ConfirmSend 側で選択ユーザーを抽出
-  const selectedUsers = users.filter(user =>
-    selectedEmails.includes(user.email)
-  );
-  
+
   return (
     <div>
       <h2>送信確認</h2>
-
-      {selectedUsers.length === 0 ? (
-        <p>送信対象のユーザーが選択されていません。</p>
-      ) : (
 
       <table className={styles.table}>
         <thead>
@@ -49,20 +39,18 @@ export const ConfirmSend: React.FC<ConfirmSendProps> = ({
           ))}
         </tbody>
       </table>
-      )}
-      
+
       <div className={styles.confirmWrapper}>
         <button 
           onClick={onBack}
-          className={styles.confirmButton}
+          className={styles.backButton}
         >
           戻る
         </button>
 
         <button
           onClick={onSend}
-          className={styles.confirmButton}
-          disabled={selectedUsers.length === 0}
+          className={styles.sendButton}
         >
           送信
         </button>
