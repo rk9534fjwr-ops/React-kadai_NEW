@@ -1,6 +1,3 @@
-'use client';
-import React from 'react';
-
 interface CheckboxProps {
   name: string;
   checked: boolean;
@@ -9,7 +6,7 @@ interface CheckboxProps {
   className?: string;
 }
 
-export const Checkbox: React.FC<CheckboxProps> = ({ name, checked, onChange, label, className }) => (
+export const Checkbox = ({ name, checked, onChange, label, className }: CheckboxProps) => (
   <label className={className}>
     <input type="checkbox" name={name} checked={checked} onChange={onChange} />
     {label}

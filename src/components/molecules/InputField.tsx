@@ -1,4 +1,3 @@
-'use client';
 import React from 'react';
 import { Input } from '../atoms/Input';
 
@@ -9,7 +8,6 @@ interface InputFieldProps {
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   onBlur?: (e: React.FocusEvent<HTMLInputElement>) => void; // ← 追加
   className?: string;
-  label?: string; // 任意に変更
 }
 
 export const InputField: React.FC<InputFieldProps> = ({

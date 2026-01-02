@@ -2,6 +2,7 @@
 import React from 'react';
 import type { UserData } from '@/resources/types/UserData';
 import styles from '../../resources/css/ConfirmSend.module.css';
+import { TABLE_ITEM, BUTTON_ITEM } from '../../contents/messages';
 
 interface ConfirmSendProps {
   users: UserData[];          // 検索結果全体
@@ -14,18 +15,21 @@ export const ConfirmSend: React.FC<ConfirmSendProps> = ({
   onBack,
   onSend,
 }) => {
+  
+  const { HEADERS } = TABLE_ITEM;
+  const { BUTTONS } = BUTTON_ITEM;
 
   return (
     <div>
-      <h2>送信確認</h2>
+      <h2>{BUTTONS.TITLE}</h2>
 
       <table className={styles.table}>
         <thead>
           <tr>
-            <th>氏名</th>
-            <th>氏名カナ</th>
-            <th>電話番号</th>
-            <th>メール</th>
+            <th>{HEADERS.NAME}</th>
+            <th>{HEADERS.NAME_KANA}</th>
+            <th>{HEADERS.PHONE}</th>
+            <th>{HEADERS.EMAIL}</th>
           </tr>
         </thead>
         <tbody>
@@ -45,14 +49,14 @@ export const ConfirmSend: React.FC<ConfirmSendProps> = ({
           onClick={onBack}
           className={styles.backButton}
         >
-          戻る
+          {BUTTONS.BACK}
         </button>
 
         <button
           onClick={onSend}
           className={styles.sendButton}
         >
-          送信
+          {BUTTONS.SEND}
         </button>
       </div>
     </div>

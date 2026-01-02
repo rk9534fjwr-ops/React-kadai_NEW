@@ -1,6 +1,3 @@
-'use client';
-import React from 'react';
-
 interface InputProps {
   id: string;
   name: string;
@@ -10,14 +7,14 @@ interface InputProps {
   className?: string;
 }
 
-export const Input: React.FC<InputProps> = ({
+export const Input = ({
   id,
   name,
   value,
   onChange,
   onBlur,
   className,
-}) => (
+}: InputProps) => (
   <input
     id={id}
     name={name}

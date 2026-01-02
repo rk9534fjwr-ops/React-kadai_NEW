@@ -1,4 +1,3 @@
-import React from 'react';
 import styles from '../../resources/css/DataTable.module.css';
 
 interface SortableHeaderProps {
@@ -8,7 +7,7 @@ interface SortableHeaderProps {
   onClick: () => void;
 }
 
-export const SortableHeader: React.FC<SortableHeaderProps> = ({ label, active, ascending, onClick }) => (
+export const SortableHeader = ({ label, active, ascending, onClick }: SortableHeaderProps) => (
   <th onClick={onClick} className={styles.sortable}>
     {label} {active ? (ascending ? '▲' : '▼') : '▲▼'}
   </th>

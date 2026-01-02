@@ -18,6 +18,11 @@
   transition: background-color 0.2s ease, color 0.2s ease;
 }
 
+.backButton:hover {
+  background-color: #999;
+  color: white;
+}
+
 /* 送信ボタン*/
 .sendButton {
   padding: 0.6rem 1.8rem;
@@ -27,6 +32,11 @@
   color: #0070f3;
   font-weight: 600;
   cursor: pointer;
+}
+
+.sendButton:hover {
+  background-color: #0070f3;
+  color: white;
 }
 
 .table {

@@ -1,18 +1,10 @@
-'use client';
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { SortableHeader } from '../atoms/SortableHeader';
 import { TableRow } from '../molecules/TableRow';
 import { PaginationControls } from '../molecules/PaginationControls';
 import styles from '../../resources/css/DataTable.module.css';
-
-interface UserData {
-  name: string;
-  nameKana: string;
-  phone: string;
-  email: string; // 一意IDとして使用
-  age: number;
-  sentStatus: '済' | '未';
-}
+import type { UserData } from '@/resources/types/UserData';
+import { TABLE_ITEM, BUTTON_ITEM, DATA_TABLE_CONFIG } from '../../contents/messages';
 
 //DataTable に props を追加
 interface DataTableProps {
@@ -22,9 +14,7 @@ interface DataTableProps {
   onConfirm: () => void; // ← 確認ボタン用
 }
 
-const ITEMS_PER_PAGE = 10;
-
-export const DataTable: React.FC<DataTableProps> = ({
+const DataTable: React.FC<DataTableProps> = ({
   data,
   selectedEmails,
   onChangeSelected,
@@ -33,6 +23,10 @@ export const DataTable: React.FC<DataTableProps> = ({
   const [sortKey, setSortKey] = useState<'age' | 'sentStatus'>('age');
   const [sortAsc, setSortAsc] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
+
+  const { ITEMS_PER_PAGE } = DATA_TABLE_CONFIG;
+  const { HEADERS } = TABLE_ITEM;
+  const { BUTTONS } = BUTTON_ITEM;
 
 // ソート
 const sortedData = [...data].sort((a, b) => {
@@ -90,16 +84,6 @@ const handleToggleItem = (email: string) => {
   }
 };
 
-/*
-if (data.length === 0) {
-  return (
-  <p className={styles.noData}>
-    該当するデータがありません。
-  </p>
-  );
-}
-*/
-
   return (
     <div className={styles.tableWrapper}>
       <table className={styles.table}>
@@ -115,23 +99,23 @@ if (data.length === 0) {
             </th>
 
             <th>
-              氏名
+               {HEADERS.NAME}
               <br />
-              <small>氏名カナ</small>
+              <small>{HEADERS.NAME_KANA}</small>
             </th>
 
-            <th>電話番号</th>
-            <th>メールアドレス</th>
+            <th>{HEADERS.PHONE}</th>
+            <th>{HEADERS.EMAIL}</th>
 
             <SortableHeader
-              label="年齢"
+              label={HEADERS.AGE}
               active={sortKey === 'age'}
               ascending={sortAsc}
               onClick={() => handleSort('age')}
             />
 
             <SortableHeader
-              label="送信状況"
+              label={HEADERS.AGE}
               active={sortKey === 'sentStatus'}
               ascending={sortAsc}
               onClick={() => handleSort('sentStatus')}
@@ -163,7 +147,7 @@ if (data.length === 0) {
           disabled={selectedEmails.length === 0}
           onClick={onConfirm}
         >
-          確認
+          {BUTTONS.CONFIRM}
         </button>
       </div>
     </div>

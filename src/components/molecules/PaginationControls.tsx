@@ -8,23 +8,34 @@ interface PaginationControlsProps {
   onPageChange: (page: number) => void;
 }
 
-export const PaginationControls: React.FC<PaginationControlsProps> = ({
+export const PaginationControls = ({
   currentPage,
   totalPages,
   onPageChange,
-}) => (
-  <div className={styles.pagination}>
-    <Button onClick={() => onPageChange(1)} disabled={currentPage === 1}>
-      先頭ページ
-    </Button>
-    <Button onClick={() => onPageChange(currentPage - 1)} disabled={currentPage === 1}>
-      前ページ
-    </Button>
-    <Button onClick={() => onPageChange(currentPage + 1)} disabled={currentPage === totalPages}>
-      次ページ
-    </Button>
-    <Button onClick={() => onPageChange(totalPages)} disabled={currentPage === totalPages}>
-      最終ページ
-    </Button>
-  </div>
-);
+}: PaginationControlsProps) => {
+  // ページ移動ハンドラ
+  const goFirst = () => onPageChange(1);
+  const goPrev = () => onPageChange(currentPage - 1);
+  const goNext = () => onPageChange(currentPage + 1);
+  const goLast = () => onPageChange(totalPages);
+
+  const isFirstPage = currentPage === 1;
+  const isLastPage = currentPage === totalPages;
+
+  return (
+    <div className={styles.pagination}>
+      <Button onClick={goFirst} disabled={isFirstPage}>
+        先頭ページ
+      </Button>
+      <Button onClick={goPrev} disabled={isFirstPage}>
+        前ページ
+      </Button>
+      <Button onClick={goNext} disabled={isLastPage}>
+        次ページ
+      </Button>
+      <Button onClick={goLast} disabled={isLastPage}>
+        最終ページ
+      </Button>
+    </div>
+  );
+};

@@ -1,10 +1,9 @@
-'use client';
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { InputField } from '../molecules/InputField';
 import { ButtonGroup } from '../molecules/ButtonGroup';
-import { Checkbox } from '../atoms/Checkbox';
 import styles from '../../resources/css/SearchForm.module.css';
 import type { SearchCriteria } from '@/resources/types/UserData';
+import { TABLE_ITEM, SEARCH_FORM_ERRORS, SEARCH_FORM_RULES } from '../../contents/messages';
 
 interface SearchFormProps {
   initialCriteria: SearchCriteria;
@@ -18,7 +17,7 @@ export const SearchForm: React.FC<SearchFormProps> = ({
   onClear,
 }) => {
   const [form, setForm] = useState<SearchCriteria>(initialCriteria);
-  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [errors, setErrors] = useState<Partial<Record<keyof SearchCriteria, string>>>({});
 
   useEffect(() => {
     setForm(initialCriteria);
@@ -48,24 +47,24 @@ export const SearchForm: React.FC<SearchFormProps> = ({
 
   // 全体バリデーション（検索時）
   const validate = () => {
-    const newErrors: Record<string, string> = {};
+    const newErrors: Partial<Record<keyof SearchCriteria, string>> = {};
 
-    if (form.name.length > 10){
-      newErrors.name = '氏名は10文字以内で入力してください。';
+    if (form.name.length > SEARCH_FORM_RULES.NAME_MAX_LENGTH){
+      newErrors.name = SEARCH_FORM_ERRORS.NAME_MAX_LENGTH;
     }
 
-    if (form.nameKana && !/^[ァ-ヶー ]+$/.test(form.nameKana)){
-      newErrors.nameKana = '氏名カナは全角カタカナで入力してください。';
+    if (form.nameKana && !SEARCH_FORM_RULES.NAME_KANA_REGEX.test(form.nameKana)){
+      newErrors.nameKana = SEARCH_FORM_ERRORS.NAME_KANA_FORMAT;
     }
 
-    if (form.phone && !/^[0-9-]+$/.test(form.phone)){
-      newErrors.phone = '電話番号は数字とハイフンのみ入力できます。';
-    } else if (form.phone.replace(/-/g, '').length > 11){
-      newErrors.phone = '電話番号は11桁以内で入力してください。';
+    if (form.phone && !SEARCH_FORM_RULES.PHONE_REGEX.test(form.phone)){
+      newErrors.phone = SEARCH_FORM_ERRORS.PHONE_FORMAT;
+    } else if (form.phone.replace(/-/g, '').length > SEARCH_FORM_RULES.PHONE_MAX_LENGTH){
+      newErrors.phone = SEARCH_FORM_ERRORS.PHONE_LENGTH;
     }
 
-    if (form.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)){
-      newErrors.email = 'メールアドレスの形式が正しくありません。';
+    if (form.email && !SEARCH_FORM_RULES.EMAIL_REGEX.test(form.email)){
+      newErrors.email = SEARCH_FORM_ERRORS.EMAIL_FORMAT;
     }
 
     setErrors(newErrors);
@@ -79,12 +78,7 @@ export const SearchForm: React.FC<SearchFormProps> = ({
   };
 
   const handleClear = () => {
-    setForm({
-      name: '',
-      nameKana: '',
-      phone: '',
-      email: '',
-    });
+    setForm(initialCriteria);
     setErrors({});
     onClear();
   };
@@ -95,28 +89,26 @@ export const SearchForm: React.FC<SearchFormProps> = ({
 
     switch (field) {
       case 'name':
-        if (form.name.length > 10){
-        newErrors.name = '氏名は10文字以内で入力してください。';
+        if (form.name.length > SEARCH_FORM_RULES.NAME_MAX_LENGTH){
+        newErrors.name = SEARCH_FORM_ERRORS.NAME_MAX_LENGTH;
         } else {
           delete newErrors.name;
         } 
         break;
 
       case 'nameKana':
-        if (form.nameKana && !/^[ァ-ヶー ]+$/.test(form.nameKana)){
-          newErrors.nameKana = 
-            '氏名カナは全角カタカナで入力してください。';
+        if (form.nameKana && !SEARCH_FORM_RULES.NAME_KANA_REGEX.test(form.nameKana)){
+          newErrors.nameKana = SEARCH_FORM_ERRORS.NAME_KANA_FORMAT;
         } else {
           delete newErrors.nameKana;
         }
         break;
 
       case 'phone':
-        if (form.phone && !/^[0-9-]+$/.test(form.phone)){
-          newErrors.phone = 
-            '電話番号は数字とハイフンのみ入力できます。';
-        } else if (form.phone.replace(/-/g, '').length > 11){
-          newErrors.phone = '電話番号は11桁以内で入力してください。';
+        if (form.phone && !SEARCH_FORM_RULES.PHONE_REGEX.test(form.phone)){
+          newErrors.phone = SEARCH_FORM_ERRORS.PHONE_FORMAT;
+        } else if (form.phone.replace(/-/g, '').length > SEARCH_FORM_RULES.PHONE_MAX_LENGTH){
+          newErrors.phone = SEARCH_FORM_ERRORS.PHONE_LENGTH;
         } else {
           delete newErrors.phone;
         }
@@ -124,11 +116,9 @@ export const SearchForm: React.FC<SearchFormProps> = ({
 
       case 'email':
       if (
-        form.email && 
-        !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)
+        form.email && !SEARCH_FORM_RULES.EMAIL_REGEX.test(form.email)
       ) {
-        newErrors.email = 
-          'メールアドレスの形式が正しくありません。';
+        newErrors.email = SEARCH_FORM_ERRORS.EMAIL_FORMAT;
       } else {
         delete newErrors.email;
       }
@@ -173,30 +163,18 @@ export const SearchForm: React.FC<SearchFormProps> = ({
       onSubmit={(e) => e.preventDefault()}
     >
       <div className={styles.row}>
-        {renderInput('name', 'name', '氏名：', form.name)}
-        {renderInput(
-          'nameKana', 
-          'nameKana', 
-          '氏名カナ：', 
-          form.nameKana
-        )}
+        {renderInput('name', 'name', TABLE_ITEM.HEADERS.NAME, form.name)}
+        {renderInput('nameKana', 'nameKana', TABLE_ITEM.HEADERS.NAME_KANA, form.nameKana)}
       </div>
 
       <div className={styles.row}>
-        {renderInput('phone', 'phone', '電話番号：', form.phone)}
-        {renderInput(
-          'email', 
-          'email', 
-          'メールアドレス：', 
-          form.email
-        )}
+        {renderInput('phone', 'phone', TABLE_ITEM.HEADERS.PHONE, form.phone)}
+        {renderInput('email', 'email',  TABLE_ITEM.HEADERS.EMAIL, form.email)}
       </div>
 
       <ButtonGroup
         onSearch={handleSearch}
         onClear={handleClear}
-        searchClass={styles.searchButton}
-        clearClass={styles.clearButton}
       />
     </form>
   );

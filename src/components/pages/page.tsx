@@ -1,9 +1,10 @@
 'use client';
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { SearchForm } from '../organisms/SearchForm';
-import { DataTable } from '../organisms/DataTable';
+import DataTable from '../organisms/DataTable';
 import { ConfirmSend } from '../organisms/ConfirmSend';
 import type { SearchCriteria, UserData } from '@/resources/types/UserData';
+import { toQueryParams } from '@/resources/utils/toQueryParams';
 
 const UserSearchTemplate: React.FC = () => {
   const [mode, setMode] = useState<'search' | 'confirm'>('search');
@@ -40,21 +41,6 @@ const UserSearchTemplate: React.FC = () => {
     setCriteria(newCriteria);
     setHasSearched(true);
     setLoading(true);
-
-    const toQueryParams = (criteria: SearchCriteria): string => {
-      const params = new URLSearchParams();
-
-      Object.entries(criteria).forEach(([key, value]) => {
-        if (typeof value === 'boolean') {
-          params.append(key, value ? 'true' : 'false');
-        }
-        if (typeof value === 'string' && value.trim() !== '') {
-          params.append(key, value);
-        }
-      });
-
-      return params.toString();
-    };
 
     try {
       const query = toQueryParams(newCriteria);
